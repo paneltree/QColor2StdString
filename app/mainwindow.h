@@ -20,6 +20,8 @@ private slots:
     void onColorButtonClicked();
     void updateColorDisplay(const QColor& color);
     void updateStringRepresentations(const QColor& color);
+    void updateColorValues(const QColor& color);
+    void updateAlternateFormats(const QColor& color);
     void onHexStringTextChanged();
     void onRgbaStringTextChanged();
 
