@@ -95,6 +95,12 @@ void MainWindow::updateColorValues(const QColor& color)
     ui->greenFEdit->setText(locale.toString(color.greenF(), 'f', 3));
     ui->blueFEdit->setText(locale.toString(color.blueF(), 'f', 3));
     ui->alphaFEdit->setText(locale.toString(color.alphaF(), 'f', 3));
+    
+    // RGB hex values
+    ui->redHexEdit->setText(QString("0x%1").arg(color.red(), 2, 16, QChar('0')).toUpper());
+    ui->greenHexEdit->setText(QString("0x%1").arg(color.green(), 2, 16, QChar('0')).toUpper());
+    ui->blueHexEdit->setText(QString("0x%1").arg(color.blue(), 2, 16, QChar('0')).toUpper());
+    ui->alphaHexEdit->setText(QString("0x%1").arg(color.alpha(), 2, 16, QChar('0')).toUpper());
 }
 
 void MainWindow::updateAlternateFormats(const QColor& color)
