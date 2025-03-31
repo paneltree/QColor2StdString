@@ -20,6 +20,30 @@ A Qt-based library for converting between QColor and std::string representation.
 
 ### Setup
 
+You can use the provided batch scripts to build and run the project:
+
+1. Quick build:
+   ```
+   build.bat
+   ```
+
+2. Clean and rebuild:
+   ```
+   clean-build.bat
+   ```
+
+3. Run the application:
+   ```
+   run-app.bat
+   ```
+
+4. Run the tests:
+   ```
+   run-tests.bat
+   ```
+
+### Manual Building
+
 1. Set up the MSVC environment:
    ```
    call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
@@ -30,20 +54,24 @@ A Qt-based library for converting between QColor and std::string representation.
    mkdir build
    cd build
    cmake .. -DCMAKE_PREFIX_PATH=C:/Qt/6.8.3/msvc2022_64
-   cmake --build .
+   cmake --build . --config Release
    ```
 
-### Running
-
-1. Run the demo application:
+3. Run the demo application:
    ```
-   .\app\colorapp.exe
+   .\build\app\Release\colorapp.exe
    ```
 
-2. Run the tests:
+4. Run the tests:
    ```
-   ctest
+   .\build\test\Release\qcolor_converter_test.exe
    ```
+
+## Project Structure
+
+- `/lib` - QColor to std::string conversion library
+- `/app` - Demo application for the library
+- `/test` - Unit tests using Google Test
 
 ## Library Usage
 

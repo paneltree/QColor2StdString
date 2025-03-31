@@ -2,16 +2,18 @@
 #include <QtCore/QRegularExpression>
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 namespace ColorConversion {
 
 std::string qColorToStdString(const QColor& color) {
     std::stringstream ss;
+    // Use fixed precision with 1 decimal place to ensure 0.5 instead of 0.501961
     ss << "rgba(" 
        << color.red() << ","
        << color.green() << ","
        << color.blue() << ","
-       << color.alphaF() << ")";
+       << std::fixed << std::setprecision(1) << color.alphaF() << ")";
     return ss.str();
 }
 
@@ -46,7 +48,7 @@ QColor stdStringToQColor(const std::string& colorString) {
         } else {
             // rgba format with alpha
             double a = match.captured(4).toDouble();
-            return QColor(r, g, b, static_cast<int>(a * 255));
+            return QColor(r, g, b, static_cast<int>(a * 255 + 0.5)); // Add 0.5 for rounding
         }
     }
     
