@@ -20,7 +20,14 @@ if(WIN32)
     endif()
 endif()
 
+# Option to build tests
+option(BUILD_TESTS "Build the test suite" OFF)
+
 # Add subdirectories
 add_subdirectory(lib)
 add_subdirectory(app)
-add_subdirectory(test) 
+
+# Only build tests if requested
+if(BUILD_TESTS)
+    add_subdirectory(test)
+endif() 

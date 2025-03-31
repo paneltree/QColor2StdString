@@ -1,12 +1,17 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "qcolor2stdstring.h"
+#include "themecolors.h"
 
 #include <QColorDialog>
 #include <QPainter>
 #include <QStyle>
 #include <QStyleOption>
 #include <QLocale>
+#include <QGridLayout>
+#include <QHBoxLayout>
+
+using namespace ColorConversion;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -15,16 +20,23 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     
-    // Connect signals/slots
+    // Connect signals/slots for color converter tab
     connect(ui->colorButton, &QPushButton::clicked, this, &MainWindow::onColorButtonClicked);
     connect(ui->hexStringEdit, &QLineEdit::textChanged, this, &MainWindow::onHexStringTextChanged);
     connect(ui->rgbaStringEdit, &QLineEdit::textChanged, this, &MainWindow::onRgbaStringTextChanged);
+    
+    // Connect theme combobox
+    connect(ui->themeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), 
+            this, &MainWindow::onThemeChanged);
     
     // Initialize with default color
     updateColorDisplay(currentColor);
     updateStringRepresentations(currentColor);
     updateColorValues(currentColor);
     updateAlternateFormats(currentColor);
+    
+    // Initialize theme colors display
+    updateThemeColorsDisplay();
 }
 
 MainWindow::~MainWindow()
@@ -193,4 +205,157 @@ void MainWindow::onRgbaStringTextChanged()
         }
         ui->cssStringEdit->setText(cssString);
     }
+}
+
+void MainWindow::onThemeChanged(int themeIndex)
+{
+    // Convert combobox index to ThemeColors::ColorTheme
+    ColorTheme theme;
+    switch(themeIndex) {
+        case 0: theme = ColorTheme::System; break;
+        case 1: theme = ColorTheme::Light; break;
+        case 2: theme = ColorTheme::Dark; break;
+        default: theme = ColorTheme::System;
+    }
+    
+    // Set the theme in our singleton
+    ThemeColors::getInstance().setTheme(theme);
+    
+    // Update the displayed theme colors
+    updateThemeColorsDisplay();
+}
+
+void MainWindow::createColorPreviewWidget(QWidget* parent, ColorRole role, const QString& label)
+{
+    // Get the color for this role
+    QColor color = ThemeColors::getInstance().getColor(role);
+    
+    // Create a container widget
+    QWidget* container = new QWidget(parent);
+    QHBoxLayout* layout = new QHBoxLayout(container);
+    layout->setContentsMargins(4, 4, 4, 4);
+    
+    // Create color preview frame
+    QFrame* colorFrame = new QFrame(container);
+    colorFrame->setMinimumSize(40, 40);
+    colorFrame->setMaximumSize(40, 40);
+    colorFrame->setFrameShape(QFrame::StyledPanel);
+    colorFrame->setFrameShadow(QFrame::Raised);
+    colorFrame->setStyleSheet(QString("background-color: %1;").arg(color.name(QColor::HexArgb)));
+    
+    // Create color info labels
+    QLabel* nameLabel = new QLabel(label, container);
+    nameLabel->setMinimumWidth(150);
+    
+    QLabel* hexValueLabel = new QLabel(color.name(QColor::HexArgb), container);
+    hexValueLabel->setMinimumWidth(100);
+    
+    QLabel* rgbValueLabel = new QLabel(QString("rgb(%1,%2,%3)").arg(color.red()).arg(color.green()).arg(color.blue()), container);
+    
+    // Add widgets to layout
+    layout->addWidget(colorFrame);
+    layout->addWidget(nameLabel);
+    layout->addWidget(hexValueLabel);
+    layout->addWidget(rgbValueLabel);
+    layout->addStretch();
+    
+    // Remember these for later updates
+    themeColorFrames.append(qMakePair(colorFrame, role));
+    themeColorLabels.append(hexValueLabel);
+    themeColorLabels.append(rgbValueLabel);
+    
+    // Add to the parent's layout
+    ui->themeColorsLayout->addWidget(container);
+}
+
+void MainWindow::updateThemeColorsDisplay()
+{
+    // Clear existing display
+    while (QLayoutItem* item = ui->themeColorsLayout->takeAt(0)) {
+        if (QWidget* widget = item->widget()) {
+            widget->deleteLater();
+        }
+        delete item;
+    }
+    themeColorFrames.clear();
+    themeColorLabels.clear();
+    
+    // Add a header for basic UI colors
+    QLabel* basicHeader = new QLabel("<b>Basic UI Colors</b>", ui->themeColorsContainer);
+    basicHeader->setAlignment(Qt::AlignLeft);
+    ui->themeColorsLayout->addWidget(basicHeader);
+    
+    // Add basic UI colors
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::Primary, "Primary");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::Secondary, "Secondary");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::Accent, "Accent");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::Success, "Success");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::Warning, "Warning");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::Error, "Error");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::Info, "Info");
+    
+    // Add a header for background colors
+    QLabel* bgHeader = new QLabel("<b>Background Colors</b>", ui->themeColorsContainer);
+    bgHeader->setAlignment(Qt::AlignLeft);
+    ui->themeColorsLayout->addWidget(bgHeader);
+    
+    // Add background colors
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::Background, "Background");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::Surface, "Surface");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::Card, "Card");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::Dialog, "Dialog");
+    
+    // Add a header for text colors
+    QLabel* textHeader = new QLabel("<b>Text Colors</b>", ui->themeColorsContainer);
+    textHeader->setAlignment(Qt::AlignLeft);
+    ui->themeColorsLayout->addWidget(textHeader);
+    
+    // Add text colors
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::TextPrimary, "Text Primary");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::TextSecondary, "Text Secondary");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::TextDisabled, "Text Disabled");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::TextOnPrimary, "Text On Primary");
+    createColorPreviewWidget(ui->themeColorsContainer, ColorRole::TextOnAccent, "Text On Accent");
+    
+    // Add a header for palette colors
+    QLabel* paletteHeader = new QLabel("<b>Palette Colors</b>", ui->themeColorsContainer);
+    paletteHeader->setAlignment(Qt::AlignLeft);
+    ui->themeColorsLayout->addWidget(paletteHeader);
+    
+    // Create a grid layout for the palette colors
+    QWidget* paletteContainer = new QWidget(ui->themeColorsContainer);
+    QGridLayout* paletteLayout = new QGridLayout(paletteContainer);
+    paletteLayout->setContentsMargins(0, 0, 0, 0);
+    
+    // Add palette colors in a grid
+    for (int i = 0; i < 20; i++) {
+        ColorRole role = static_cast<ColorRole>(static_cast<int>(ColorRole::Palette1) + i);
+        QColor color = ThemeColors::getInstance().getColor(role);
+        
+        // Create color preview frame
+        QFrame* colorFrame = new QFrame(paletteContainer);
+        colorFrame->setMinimumSize(60, 40);
+        colorFrame->setFrameShape(QFrame::StyledPanel);
+        colorFrame->setFrameShadow(QFrame::Raised);
+        colorFrame->setStyleSheet(QString("background-color: %1;").arg(color.name(QColor::HexArgb)));
+        
+        // Create color info label
+        QLabel* colorLabel = new QLabel(QString("Palette%1\n%2").arg(i+1).arg(color.name(QColor::HexArgb)), paletteContainer);
+        colorLabel->setAlignment(Qt::AlignCenter);
+        
+        // Add to grid layout
+        int row = i / 5;
+        int col = i % 5;
+        paletteLayout->addWidget(colorFrame, row*2, col);
+        paletteLayout->addWidget(colorLabel, row*2+1, col);
+        
+        // Remember these for later updates
+        themeColorFrames.append(qMakePair(colorFrame, role));
+        themeColorLabels.append(colorLabel);
+    }
+    
+    ui->themeColorsLayout->addWidget(paletteContainer);
+    
+    // Add a spacer at the end
+    ui->themeColorsLayout->addStretch();
 } 

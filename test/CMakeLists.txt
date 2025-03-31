@@ -1,8 +1,7 @@
 enable_testing()
 
-# Add GoogleTest
-add_subdirectory(googletest)
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+# Find GTest package
+find_package(GTest REQUIRED)
 
 # Add test executable
 add_executable(qcolor_converter_test
@@ -12,10 +11,11 @@ add_executable(qcolor_converter_test
 # Link against GoogleTest and our library
 target_link_libraries(qcolor_converter_test
     qcolor2stdstring
-    gtest
-    gtest_main
+    GTest::GTest
+    GTest::Main
     Qt6::Core
     Qt6::Gui
+    Qt6::Widgets
 )
 
 # Deploy Qt DLLs for Windows
