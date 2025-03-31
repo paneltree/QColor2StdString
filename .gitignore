@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+build
+test/googltest
+QColor2StdString/test/googletest/
