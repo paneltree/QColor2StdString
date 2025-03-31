@@ -7,14 +7,18 @@ if not exist build mkdir build
 
 echo Running CMake...
 cd build
+echo Current directory: %cd%
 cmake .. -DCMAKE_PREFIX_PATH=C:/Qt/6.8.3/msvc2022_64
 
 echo Building project...
 cmake --build . --config Release
 
-echo.
-echo Build completed. You can run:
-echo - Demo App: .\app\Release\colorapp.exe
-echo - Tests: .\test\Release\qcolor_converter_test.exe
+"C:\Qt\6.8.3\msvc2022_64\bin\windeployqt.exe"  app\Release\colorapp.exe
+"C:\Qt\6.8.3\msvc2022_64\bin\windeployqt.exe" test\Release\qcolor_converter_test.exe
 
 cd .. 
+echo.
+echo Build completed. You can run:
+echo Current directory: %cd%
+echo - Demo App: .\build\app\Release\colorapp.exe
+echo - Tests: .\build\test\Release\qcolor_converter_test.exe
