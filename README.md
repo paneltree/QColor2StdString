@@ -14,12 +14,19 @@ A Qt-based library for converting between QColor and std::string representation.
 
 ### Prerequisites
 
+#### Windows
 - Qt 6.8.3 (installed at `C:\Qt\6.8.3`)
 - Visual Studio 2022 Community (MSVC 2022)
 - CMake 3.16 or higher
 
+#### macOS
+- Qt 6.8.3 (installed at `/Users/paneltree/Qt/6.8.3`)
+- CMake 3.16 or higher
+- Xcode Command Line Tools
+
 ### Setup
 
+#### Windows
 You can use the provided batch scripts to build and run the project:
 
 1. Quick build:
@@ -42,8 +49,32 @@ You can use the provided batch scripts to build and run the project:
    run-tests.bat
    ```
 
+#### macOS
+You can use the provided shell scripts to build and run the project:
+
+1. Quick build:
+   ```
+   ./build.sh
+   ```
+
+2. Clean and rebuild:
+   ```
+   ./clean-build.sh
+   ```
+
+3. Run the application:
+   ```
+   ./run-app.sh
+   ```
+
+4. Run the tests:
+   ```
+   ./run-tests.sh
+   ```
+
 ### Manual Building
 
+#### Windows
 1. Set up the MSVC environment:
    ```
    call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
@@ -65,6 +96,25 @@ You can use the provided batch scripts to build and run the project:
 4. Run the tests:
    ```
    .\build\test\Release\qcolor_converter_test.exe
+   ```
+
+#### macOS
+1. Build the project:
+   ```
+   mkdir -p build
+   cd build
+   cmake .. -DCMAKE_PREFIX_PATH=/Users/paneltree/Qt/6.8.3/macos
+   cmake --build . --config Release
+   ```
+
+2. Run the demo application:
+   ```
+   ./build/app/colorapp.app/Contents/MacOS/colorapp
+   ```
+
+3. Run the tests:
+   ```
+   ./build/test/qcolor_converter_test
    ```
 
 ## Project Structure

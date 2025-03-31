@@ -18,7 +18,15 @@ target_link_libraries(qcolor_converter_test
     Qt6::Widgets
 )
 
-# Deploy Qt DLLs for Windows
+# Set macOS properties for test executable
+if(APPLE)
+    # Tests don't need to be in a bundle format
+    set_target_properties(qcolor_converter_test PROPERTIES
+        MACOSX_BUNDLE FALSE
+    )
+endif()
+
+# Deploy Qt dependencies
 if(WIN32)
     # Add custom command to run windeployqt after build
     add_custom_command(TARGET qcolor_converter_test POST_BUILD
