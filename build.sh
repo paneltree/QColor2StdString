@@ -6,7 +6,7 @@ mkdir -p build
 echo "Running CMake..."
 cd build
 echo "Current directory: $(pwd)"
-cmake .. -DCMAKE_PREFIX_PATH=/Users/paneltree/Qt/6.8.3/macos
+cmake .. -DCMAKE_PREFIX_PATH=/Users/paneltree/Qt/6.8.3/macos/lib/cmake
 
 echo "Building project..."
 cmake --build . --config Release
